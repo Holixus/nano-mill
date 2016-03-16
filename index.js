@@ -71,7 +71,7 @@ module.exports = function create(opts) {
 	});
 
 	mill.build = function () {
-		this.sched('build')
+		return this.sched('build')
 			.job('init', mill.opts)
 				.seq(' > (mill.plugins | mill.sources), mill.rules > ')
 				.up

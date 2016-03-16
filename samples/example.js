@@ -1,4 +1,4 @@
-var Mill = require('nano-mill');
+var Mill = require('../');
 
 var mill = Mill({
 	plugins_folder: './plugins',
@@ -11,5 +11,4 @@ var mill = Mill({
 });
 
 mill.build().then(function() {
-	mill.signal('all done');
 });
