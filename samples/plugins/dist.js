@@ -6,8 +6,7 @@ var fs = require('nano-fs'),
 module.exports = {
 
 clean: function (log, data) {
-	var opts = data.opts;
-	return fs.empty(opts.dist_folder);
+	return fs.empty(data.dist_folder || (data.opts && data.opts.dist_folder));
 }
 
 };

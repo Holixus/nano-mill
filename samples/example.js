@@ -5,8 +5,8 @@ var mill = Mill({
 	sources_folder: './src',
 	dist_folder: './dist',
 	dumps_folder: './log',
-	before: [
-		'> dist.clean >'
+	init: [
+		'plugins > dist.clean > before'
 	],
 	rules: {
 		UPPERCASE: [ /^.*$/, { dest: '\\1upper/\\2\\3' }, ' > file.load, case.upper, file.rename, file.save >' ],

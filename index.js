@@ -69,7 +69,7 @@ module.exports = function create(opts) {
 
 			for (var id in rules) {
 				var rule = rules[id],
-				    re = /./,
+				    re,
 				    args;
 
 				if (rule[0] instanceof RegExp)
@@ -77,6 +77,13 @@ module.exports = function create(opts) {
 
 				if (typeof rule[0] === 'object')
 					args = rule.splice(0,1)[0];
+
+				if (!re) {
+					sched.job(name, defaults({
+							opts: opts
+						}, args)).seq(rule);
+					continue;
+				}
 
 				files.forEach(function (name) {
 					if (!re.test(name))
@@ -94,11 +101,15 @@ module.exports = function create(opts) {
 	});
 
 	mill.build = function () {
-		return this.sched('build')
-			.job('init', mill.opts)
-				.seq(' > (mill.plugins | mill.sources), mill.before, mill.rules > ')
-				.up
-			.start();
+		var sched = this.sched('mill'),
+		    job = sched.job('init', mill.opts)
+				.seq([
+					' > mill.plugins > plugins', 'plugins >> before',
+					' > mill.sources                      > before',
+						'before > mill.before > rules', 'rules > mill.rules > ']);
+			if (mill.opts.init)
+				job.seq(mill.opts.init);
+			return sched.start();
 	};
 
 	return mill;
