@@ -4,9 +4,11 @@ var Mill = require('nano-sched'),
     Promise = require('nano-promise');
 
 function defaults(opts, defs) {
-	for (var id in defs)
-		if (!(id in opts))
-			opts[id] = defs[id];
+	if (defs)
+		for (var id in defs)
+			if (!(id in opts))
+				opts[id] = defs[id];
+	return opts;
 }
 
 module.exports = function create(opts) {
@@ -41,28 +43,49 @@ module.exports = function create(opts) {
 					opts.files = list;
 				});
 		},
-		'rules': function sync(log, opts) {
+		'before': function (log, opts) {
+			if (!opts.before)
+				return;
+
+			var sched = mill.sched(' before'),
+			    before = opts.before,
+			    args;
+
+			if (typeof before[0] === 'object')
+				args = before.splice(0,1)[0];
+
+			var job = sched.job('before', defaults({
+					opts: opts
+				}, args));
+
+			job.seq(before);
+
+			return sched.start();
+		},
+		'rules': function (log, opts) {
 			var sched = mill.sched(' rules'),
 			    rules = opts.rules,
 			    files = opts.files;
 
 			for (var id in rules) {
 				var rule = rules[id],
-				    re = /./;
+				    re = /./,
+				    args;
 
 				if (rule[0] instanceof RegExp)
 					re = rule.splice(0,1)[0];
 
+				if (typeof rule[0] === 'object')
+					args = rule.splice(0,1)[0];
+
 				files.forEach(function (name) {
 					if (!re.test(name))
 						return;
-					var job = sched.job(name, {
-						opts: opts,
-						name: name
-					});
-					rule.forEach(function (seq) {
-						job.seq(seq);
-					});
+					var job = sched.job(name, defaults({
+							opts: opts,
+							name: name
+						}, args));
+					job.seq(rule);
 				});
 			}
 
@@ -73,7 +96,7 @@ module.exports = function create(opts) {
 	mill.build = function () {
 		return this.sched('build')
 			.job('init', mill.opts)
-				.seq(' > (mill.plugins | mill.sources), mill.rules > ')
+				.seq(' > (mill.plugins | mill.sources), mill.before, mill.rules > ')
 				.up
 			.start();
 	};

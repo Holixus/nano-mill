@@ -14,16 +14,34 @@ load: function (log, data) {
 		});
 },
 
+dist_load: function (log, data) {
+	var opts = data.opts,
+	    src = Path.join(opts.dist_folder, data.name);
+	return fs.readFile(src, data.encoding = 'utf8')
+		.then(function (text) {
+			data.content = text;
+		});
+},
+
+rename: function sync(log, data) {
+	var dest = data.dest || data.name;
+
+	if (dest.indexOf('\\') >= 0)
+		dest = data.name.replace(/^(.*\/)?([^/]+)(\.[a-z0-9_]+)$/, dest.replace(/\\/g, '$'));
+
+	data.dest = Path.join(data.opts.dist_folder, dest);
+},
+
 save: function (log, data) {
 	var opts = data.opts,
-	    dst = Path.join(opts.dist_folder, data.name);
+	    dest = data.dest || data.name;
 
 	if (typeof data.content !== 'string')
 		throw Error('data content is not a string');
 
-	return fs.mkpath(Path.dirname(dst))
+	return fs.mkpath(Path.dirname(dest))
 		.then(function () {
-			return fs.writeFile(dst, data.content, { encoding: data.encoding });
+			return fs.writeFile(dest, data.content, { encoding: data.encoding });
 		});
 },
 
