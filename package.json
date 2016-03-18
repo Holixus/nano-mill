@@ -1,6 +1,6 @@
 {
   "name": "nano-mill",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A basic build system usable for massive files transformations",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Holixus/nano-mill#readme",
   "dependencies": {
+    "nano-promise": "1",
     "nano-sched": "1.2"
   },
   "devDependencies": {
