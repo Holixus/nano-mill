@@ -19,8 +19,9 @@ var mill = Mill({
 	sources_folder: './src',
 	dist_folder: './dist',
 	dumps_folder: './log',
+	init: [ 'plugins > dist.clean > before' ],
 	rules: {
-		'js': [ /^.*\.js$/, ' > file.load, upcase, file.save > ' ]
+		'js': [ /^.*\.js$/, ' > file.load, case.upper, file.save > ' ]
 	}
 });
 ```
