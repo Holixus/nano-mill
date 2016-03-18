@@ -24,7 +24,7 @@ module.exports = function create(opts) {
 
 	mill.install('mill', {
 		'plugins': function readPlugins(log, opts) {
-			return fs.readdir(opts.plugins_folder || './plugins')
+			return fs.readdir(opts.plugins_folder || /* istanbul ignore next */ './plugins')
 				.then(function (list) {
 					return Promise.all(list
 						.map(function (name) {
@@ -38,7 +38,7 @@ module.exports = function create(opts) {
 			});
 		},
 		'sources': function readtree(log, opts) {
-			return fs.readTree(opts.src_folder || './src')
+			return fs.readTree(opts.sources_folder || /* istanbul ignore next */ './src')
 				.then(function (list) {
 					opts.files = list;
 				});
@@ -79,7 +79,7 @@ module.exports = function create(opts) {
 					args = rule.splice(0,1)[0];
 
 				if (!re) {
-					sched.job(name, defaults({
+					sched.job(id, defaults({
 							opts: opts
 						}, args)).seq(rule);
 					continue;

@@ -29,12 +29,12 @@ rename: function sync(log, data) {
 	if (dest.indexOf('\\') >= 0)
 		dest = data.name.replace(/^(.*\/)?([^/]+)(\.[a-z0-9_]+)$/, dest.replace(/\\/g, '$'));
 
-	data.dest = Path.join(data.opts.dist_folder, dest);
+	data.dest = dest;
 },
 
 save: function (log, data) {
 	var opts = data.opts,
-	    dest = data.dest || data.name;
+	    dest = Path.join(data.opts.dist_folder, data.dest || data.name);
 
 	if (typeof data.content !== 'string')
 		throw Error('data content is not a string');
