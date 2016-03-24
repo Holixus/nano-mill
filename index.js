@@ -30,9 +30,10 @@ module.exports = function create(opts) {
 						.map(function (name) {
 							if (!/^[^.].*\.js$/.test(name))
 								return;
-							return fs.readFile(Path.join(opts.plugins_folder, name), 'utf8')
+							var filename = Path.join(opts.plugins_folder, name);
+							return fs.readFile(filename, 'utf8')
 								.then(function (text) {
-									mill.install(name.replace(/([^/]*)\.js$/,'$1'), text);
+									mill.install(name.replace(/([^/]*)\.js$/,'$1'), text, filename);
 								});
 						}));
 			});
