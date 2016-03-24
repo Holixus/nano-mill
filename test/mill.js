@@ -17,6 +17,14 @@ var _console = {
 
 var Mill = require('../index.js');
 
+function fsinit(opts) {
+	return fs.empty(opts.dist_folder)
+		.catch(function () {
+			return fs.mkpath(opts.dist_folder);
+		});
+}
+
+
 suite('mill', function () {
 	test('1 - then sched', function (done) {
 		var src = Path.resolve(__dirname+'/../samples/src'),
@@ -51,7 +59,10 @@ suite('mill', function () {
 		    },
 		    mill = Mill(opts);
 
-		mill.build().then(function () {
+		fsinit(opts).then(function () {
+				return mill.build();
+			})
+			.then(function () {
 			assert.strictEqual(opts.gen, "init-before-global");
 			return Promise.all([
 				fs.readFile(src+'/job.js', 'utf8'),
@@ -73,6 +84,7 @@ suite('mill', function () {
 		    	dumps_folder:   Path.resolve(__dirname+'/../samples/log'),
 		    	console: _console,
 		    	gen: '',
+		    	//init: [ 'plugins > dist.clean > before' ],
 		    	//init: [ 'plugins > dist.clean | iinit > before' ],
 		    	before: [ { bef: 'before' }, '> ibefore >' ],
 		    	rules: {
@@ -96,7 +108,10 @@ suite('mill', function () {
 		    },
 		    mill = Mill(opts);
 
-		mill.build().then(function () {
+		fsinit(opts).then(function () {
+				return mill.build();
+			})
+			.then(function () {
 			assert.strictEqual(opts.gen, "before-global");
 			return Promise.all([
 				fs.readFile(src+'/job.js', 'utf8'),
@@ -141,7 +156,10 @@ suite('mill', function () {
 		    },
 		    mill = Mill(opts);
 
-		mill.build().then(function () {
+		fsinit(opts).then(function () {
+				return mill.build();
+			})
+			.then(function () {
 			assert.strictEqual(opts.gen, "init-global");
 			return Promise.all([
 				fs.readFile(src+'/job.js', 'utf8'),
