@@ -1,6 +1,6 @@
 {
   "name": "nano-mill",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A basic build system usable for massive files transformations",
   "main": "index.js",
   "scripts": {
