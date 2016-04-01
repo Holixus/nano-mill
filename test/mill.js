@@ -182,4 +182,119 @@ suite('mill', function () {
 			});
 		}).catch(done);
 	});
+
+	test('4 - then sched with sub-rules', function (done) {
+		var src = Path.resolve(__dirname+'/../samples/src'),
+		    dist = Path.resolve(__dirname+'/../samples/dist'),
+		    opts = {
+		    	plugins_folder: Path.resolve(__dirname+'/../samples/plugins'),
+		    	sources_folder: src,
+		    	dist_folder:    dist,
+		    	dumps_folder:   Path.resolve(__dirname+'/../samples/log'),
+		    	console: _console,
+		    	gen: '',
+		    	init: [ 'plugins > dist.clean | iinit > before' ],
+		    	//before: [ { bef: 'before' }, '> ibefore >' ],
+		    	rules: {
+		    		job: [ '> igen >' ],
+		    		subRules: [ {
+		    				sched_name: '  sub-sched',
+		    				rules: {
+		    					file: [ /^.*\.js$/, { dest: '\\1\\2-\\3' }, ' > file.load, case.upper, file.rename, file.save >' ]
+		    				}
+		    			}, '> mill.sources, mill.sched-rules >' ],
+		    		subRules2: [ {
+		    				sched_name: '  sub-sched2'
+		    			}, '> mill.sources, mill.sched-rules >' ]
+		    	},
+		    	plugins: {
+		    		iinit: function (log, data) {
+		    			var opts = data;
+		    			opts.gen += 'init';
+		    		},
+		    		ibefore: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += data.bef;
+		    		},
+		    		igen: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += '-global';
+		    		}
+		    	}
+		    },
+		    mill = Mill(opts);
+
+		fsinit(opts).then(function () {
+				return mill.build();
+			})
+			.then(function () {
+				assert.strictEqual(opts.gen, "init-global");
+				return Promise.all([
+					fs.readFile(src+'/job.js', 'utf8'),
+					fs.readFile(dist+'/job-.js', 'utf8')
+				]).spread(function (s, d) {
+					assert.strictEqual(d, s.toUpperCase());
+					done();
+				});
+			}).catch(done);
+	});
+
+	test('5 - then sched with sub-rules', function (done) {
+		var src = Path.resolve(__dirname+'/../samples/src'),
+		    dist = Path.resolve(__dirname+'/../samples/dist'),
+		    opts = {
+		    	plugins_folder: Path.resolve(__dirname+'/../samples/plugins'),
+		    	sources_folder: src,
+		    	dist_folder:    dist,
+		    	dumps_folder:   Path.resolve(__dirname+'/../samples/log'),
+		    	console: _console,
+		    	gen: '',
+		    	init: [ 'plugins > dist.clean | iinit > before' ],
+		    	//before: [ { bef: 'before' }, '> ibefore >' ],
+		    	rules: {
+		    		job: [ '> igen, mill.dump-data >' ],
+		    		subRules: [ {
+		    				sched_name: '  sub-sched',
+		    				sources_folder: './samples/src',
+		    				dist_folder: './samples/dist',
+		    				rules: {
+		    					file: [ /^.*\.js$/, { dest: '\\1\\2-\\3' }, ' > file.load, case.upper, file.rename, file.save >' ]
+		    				}
+		    			}, '> mill.sources, mill.sched-rules >' ],
+		    		subRules2: [ {
+		    				sched_name: '  sub-sched2'
+		    			}, '> mill.sources, mill.sched-rules >' ]
+		    	},
+		    	plugins: {
+		    		iinit: function (log, data) {
+		    			var opts = data;
+		    			opts.gen += 'init';
+		    		},
+		    		ibefore: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += data.bef;
+		    		},
+		    		igen: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += '-global';
+		    		}
+		    	}
+		    },
+		    mill = Mill(opts);
+
+		fsinit(opts).then(function () {
+				return mill.build();
+			})
+			.then(function () {
+				assert.strictEqual(opts.gen, "init-global");
+				return Promise.all([
+					fs.readFile(src+'/job.js', 'utf8'),
+					fs.readFile(dist+'/job-.js', 'utf8')
+				]).spread(function (s, d) {
+					assert.strictEqual(d, s.toUpperCase());
+					done();
+				});
+			}).catch(done);
+	});
+
 });
