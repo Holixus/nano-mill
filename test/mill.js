@@ -40,9 +40,15 @@ suite('mill', function () {
 		    	before: [ '> ibefore >' ],
 		    	rules: {
 		    		job: [ '> igen >' ],
-		    		file: [ /^.*\.js$/, ' > file.load, case.upper, file.save >' ]
+		    		file: [ /^.*\.js$/, ' > id-check, file.load, case.upper, file.save >' ]
 		    	},
 		    	plugins: {
+		    		'id-check': function (log, data) {
+		    			if (!data.id)
+		    				throw Error('hasn`t id');
+		    			if (data.id !== data.name.replace(/^.*([^/]+)\.[a-z0-9]+$/i, '$1'))
+		    				throw Error('wrong auto-id:"+data.id+"');
+		    		},
 		    		iinit: function (log, data) {
 		    			var opts = data;
 		    			opts.gen += 'init';
@@ -89,9 +95,15 @@ suite('mill', function () {
 		    	before: [ { bef: 'before' }, '> ibefore >' ],
 		    	rules: {
 		    		job: [ '> igen >' ],
-		    		file: [ /^.*\.js$/, ' > file.load, case.upper, file.save >' ]
+		    		file: [ /^.*\.(js)$/, ' > id-check, file.load, case.upper, file.save >' ]
 		    	},
 		    	plugins: {
+		    		'id-check': function (log, data) {
+		    			if (!data.id)
+		    				throw Error('hasn`t id');
+		    			if (data.id !== 'js')
+		    				throw Error('wrong auto-id:"+data.id+". should be "js"');
+		    		},
 		    		iinit: function (log, data) {
 		    			var opts = data;
 		    			opts.gen += 'init';

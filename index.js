@@ -87,11 +87,13 @@ module.exports = function create(opts) {
 				}
 
 				files.forEach(function (name) {
-					if (!re.test(name))
+					var ok = re.exec(name);
+					if (!ok)
 						return;
 					var job = sched.job(name, defaults({
 							opts: opts,
-							name: name
+							name: name,
+							id: ok[1] || name.replace(/^.*([^/]+)\.[a-z0-9]+$/i, '$1')
 						}, args));
 					job.seq(rule);
 				});
