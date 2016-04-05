@@ -46,7 +46,7 @@ suite('mill', function () {
 		    		'id-check': function (log, data) {
 		    			if (!data.id)
 		    				throw Error('hasn`t id');
-		    			if (data.id !== data.name.replace(/^.*([^/]+)\.[a-z0-9]+$/i, '$1'))
+		    			if (data.id !== data.name.replace(/^.*?([^/]+)\.[a-z0-9]+$/i, '$1'))
 		    				throw Error('wrong auto-id:"+data.id+"');
 		    		},
 		    		iinit: function (log, data) {
@@ -294,6 +294,31 @@ suite('mill', function () {
 					assert.strictEqual(d, s.toUpperCase());
 					done();
 				});
+			}).catch(done);
+	});
+
+	test('6 - without sources folder', function (done) {
+		var opts = {
+		    	plugins_folder: Path.resolve(__dirname+'/../samples/plugins'),
+		    	dumps_folder:   Path.resolve(__dirname+'/../samples/log'),
+		    	console: _console,
+		    	gen: '',
+		    	rules: {
+		    		job: [ '> igen >' ]
+		    	},
+		    	plugins: {
+		    		igen: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += '-global';
+		    		}
+		    	}
+		    },
+		    mill = Mill(opts);
+
+		mill.build(opts)
+			.then(function () {
+				assert.strictEqual(opts.gen, "-global");
+				done();
 			}).catch(done);
 	});
 

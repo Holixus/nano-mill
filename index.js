@@ -34,7 +34,10 @@ var plugins = {
 		});
 	},
 	'sources': function readtree(log, data) {
-		return fs.readTree(data.sources_folder || data.opts.sources_folder || /* istanbul ignore next */ './src')
+		var src = data.sources_folder || (data.opts && data.opts.sources_folder);
+		if (!src)
+			return data.files = [], 0;
+		return fs.readTree(src)
 			.then(function (list) {
 				data.files = list;
 			});
@@ -99,7 +102,7 @@ var plugins = {
 					return;
 				var job = sched.job(name, defaults({
 						name: name,
-						id: ok[1] || name.replace(/^.*([^/]+)\.[a-z0-9]+$/i, '$1')
+						id: ok[1] || name.replace(/^.*?([^/]+)\.[a-z0-9]+$/i, '$1')
 					}, args, defs));
 				job.seq(rule);
 			});
@@ -116,8 +119,8 @@ var plugins = {
 module.exports = function create(opts) {
 	defaults(opts, {
 		plugins_folder: './plugins',
-		sources_folder: './src',
-		dist_folder: './dist',
+		//sources_folder: './src',
+		//dist_folder: './dist',
 		dumps_folder: './log',
 		rules: {}
 	});
@@ -131,7 +134,7 @@ module.exports = function create(opts) {
 		    job = sched.job('init', mill.opts)
 				.seq([
 					' > mill.plugins > plugins', 'plugins >> before',
-					' > mill.sources                      > before',
+					' > mill.sources                       > before',
 						'before > mill.before > rules', 'rules > mill.sched-rules > ']);
 			if (mill.opts.init)
 				job.seq(mill.opts.init);
