@@ -108,7 +108,9 @@ var plugins = {
 			});
 		}
 
-		return sched.start();
+		return sched.start().catch(function (err) {
+			throw 'abort';
+		});
 	},
 	'dump-data': function (log, data) {
 		return log.writeListing('dump-data', data);
