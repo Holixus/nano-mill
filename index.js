@@ -113,7 +113,7 @@ var plugins = {
 		});
 	},
 	'dump-data': function (log, data) {
-		return log.writeListing('dump-data', data);
+		log.writeListing('dump-data', data);
 	}
 
 };
