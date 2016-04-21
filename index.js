@@ -1,5 +1,5 @@
 var Mill = require('nano-sched'),
-    fs = require('nano-fs'),
+    newUniFS = require('nano-unifs'),
     Path = require('path'),
     Promise = require('nano-promise');
 
@@ -18,17 +18,17 @@ function defaults(opts, defs, defs2) {
 
 var plugins = {
 	'plugins': function readPlugins(log, opts) {
-		var mill = log.job.sched.mill;
-		return fs.readdir(opts.plugins_folder || /* istanbul ignore next */ './plugins')
+		var mill = log.job.sched.mill,
+		    fs = newUniFS(opts.plugins_folder || /* istanbul ignore next */ './plugins')
+		return fs.listFiles('/')
 			.then(function (list) {
 				return Promise.all(list
 					.map(function (name) {
 						if (!/^[^.].*\.js$/.test(name))
 							return;
-						var filename = Path.join(opts.plugins_folder, name);
-						return fs.readFile(filename, 'utf8')
+						return fs.readFile(name, 'utf8')
 							.then(function (text) {
-								mill.install(name.replace(/([^/]*)\.js$/,'$1'), text, filename);
+								mill.install(name.replace(/([^/]*)\.js$/,'$1'), text, name);
 							});
 					}));
 		});
@@ -37,7 +37,8 @@ var plugins = {
 		var src = data.sources_folder || (data.opts && data.opts.sources_folder);
 		if (!src)
 			return data.files = [], 0;
-		return fs.readTree(src)
+		var fs = newUniFS(src)
+		return fs.listFiles('/')
 			.then(function (list) {
 				data.files = list;
 			});
