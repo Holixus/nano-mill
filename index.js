@@ -82,8 +82,8 @@ var plugins = {
 
 		for (var id in rules) {
 			var rule = rules[id],
-			    re,
-			    args;
+			    re = undefined,
+			    args = undefined;
 
 			if (rule[0] instanceof RegExp)
 				re = rule.splice(0,1)[0];
