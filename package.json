@@ -1,6 +1,6 @@
 {
   "name": "nano-mill",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "A basic build system usable for massive files transformations",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "dependencies": {
     "nano-promise": "1",
     "nano-unifs": "1",
-    "nano-sched": "1.3"
+    "nano-sched": "1.4"
   },
   "devDependencies": {
     "core-assert": "0",

@@ -62,14 +62,18 @@ var plugins = {
 
 		return sched.start();
 	},
-	'sched-rules': function (log, data) {
-		var sched = log.job.sched.mill.sched(data.sched_name || ' rules'),
+	'rules': function (log, data) {
+		var sched_name = data.sched_name,
+		    sched = log.job.sched,
 		    opts = data.opts || data,
 		    rules = data.rules,
 		    files = data.files;
 
 		if (!rules)
 			return;
+
+		if (sched_name)
+			sched = log.job.sched.mill.sched(data.sched_name);
 
 		var defs = {
 			opts: opts
@@ -109,12 +113,19 @@ var plugins = {
 			});
 		}
 
-		return sched.start().catch(function (err) {
-			throw 'abort';
-		});
+		if (sched_name)
+			return sched.start().catch(function (err) {
+				throw 'abort';
+			});
 	},
 	'dump-data': function (log, data) {
-		log.writeListing('dump-data', data);
+		log.writeListing('json', data);
+	},
+	'dump-data-opts': function (log, data) {
+		log.writeListing('json', data.opts);
+	},
+	'dump-opts': function (log, data) {
+		log.writeListing('json', log.job.sched.opts);
 	}
 
 };
@@ -138,7 +149,7 @@ module.exports = function create(opts) {
 				.seq([
 					' > mill.plugins > plugins', 'plugins >> before',
 					' > mill.sources                       > before',
-						'before > mill.before > rules', 'rules > mill.sched-rules > ']);
+						'before > mill.before > rules', 'rules > mill.rules > ']);
 			if (mill.opts.init)
 				job.seq(mill.opts.init);
 			return sched.start();

@@ -202,10 +202,10 @@ suite('mill', function () {
 		    				rules: {
 		    					file: [ /^.*\.js$/, { dest: '\\1\\2-\\3' }, ' > file.load, case.upper, file.rename, file.save >' ]
 		    				}
-		    			}, '> mill.sources, mill.sched-rules >' ],
+		    			}, '> mill.sources, mill.rules >' ],
 		    		subRules2: [ {
 		    				sched_name: '  sub-sched2'
-		    			}, '> mill.sources, mill.sched-rules >' ]
+		    			}, '> mill.sources, mill.rules >' ]
 		    	},
 		    	plugins: {
 		    		iinit: function (log, data) {
@@ -260,13 +260,13 @@ suite('mill', function () {
 		    				rules: {
 		    					file: [ /^.*\.js$/, { dest: '\\1\\2-\\3' }, ' > file.load, case.upper, file.rename, file.save >' ]
 		    				}
-		    			}, '> mill.sources, mill.sched-rules >' ],
+		    			}, '> mill.sources, mill.rules >' ],
 		    		subRules2: [ {
 		    				sched_name: '  sub-sched2',
 		    				rules: {
 		    					abort: [ '> abort >' ]
 		    				}
-		    			}, '> mill.sources, mill.sched-rules >' ]
+		    			}, '> mill.sources, mill.rules >' ]
 		    	},
 		    	plugins: {
 		    		abort: function (log, data) {
@@ -321,10 +321,10 @@ suite('mill', function () {
 		    				rules: {
 		    					file: [ /^.*\.js$/, { dest: '\\1\\2-\\3' }, ' > file.load, case.upper, file.rename, file.save >' ]
 		    				}
-		    			}, '> mill.sources, mill.sched-rules >' ],
+		    			}, '> mill.sources, mill.rules >' ],
 		    		subRules2: [ {
 		    				sched_name: '  sub-sched2'
-		    			}, '> mill.sources, mill.sched-rules >' ]
+		    			}, '> mill.sources, mill.rules >' ]
 		    	},
 		    	plugins: {
 		    		iinit: function (log, data) {
@@ -382,5 +382,91 @@ suite('mill', function () {
 				done();
 			}).catch(done);
 	});
+
+	test('7 - dump-data-opts', function (done) {
+		var dumps_fs = {},
+		    opts = {
+		    	plugins_folder: Path.resolve(__dirname+'/../samples/plugins'),
+		    	dumps_folder:   dumps_fs,
+		    	console: _console,
+		    	gen: '',
+		    	rules: {
+		    		job: [ '> igen, mill.dump-data-opts >' ]
+		    	},
+		    	plugins: {
+		    		igen: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += '-global';
+		    		}
+		    	}
+		    },
+		    mill = Mill(opts);
+
+		mill.build(opts)
+			.then(function () {
+				assert.strictEqual(opts.gen, "-global");
+				var dump = dumps_fs["mill!job#mill.dump-data-opts.json"];
+				assert.deepStrictEqual(typeof dump, 'string');
+				done();
+			}).catch(done);
+	});
+
+	test('8 - dump-opts', function (done) {
+		var dumps_fs = {},
+		    opts = {
+		    	plugins_folder: Path.resolve(__dirname+'/../samples/plugins'),
+		    	dumps_folder:   dumps_fs,
+		    	console: _console,
+		    	gen: '',
+		    	rules: {
+		    		job: [ '> igen, mill.dump-opts >' ]
+		    	},
+		    	plugins: {
+		    		igen: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += '-global';
+		    		}
+		    	}
+		    },
+		    mill = Mill(opts);
+
+		mill.build(opts)
+			.then(function () {
+				assert.strictEqual(opts.gen, "-global");
+				var dump = dumps_fs["mill!job#mill.dump-opts.json"];
+				assert.deepStrictEqual(typeof dump, 'string');
+				done();
+			}).catch(done);
+	});
+
+
+	test('9 - dump-data', function (done) {
+		var dumps_fs = {},
+		    opts = {
+		    	plugins_folder: Path.resolve(__dirname+'/../samples/plugins'),
+		    	dumps_folder:   dumps_fs,
+		    	console: _console,
+		    	gen: '',
+		    	rules: {
+		    		job: [ '> igen, mill.dump-data >' ]
+		    	},
+		    	plugins: {
+		    		igen: function (log, data) {
+		    			var opts = data.opts;
+		    			opts.gen += '-global';
+		    		}
+		    	}
+		    },
+		    mill = Mill(opts);
+
+		mill.build(opts)
+			.then(function () {
+				assert.strictEqual(opts.gen, "-global");
+				var dump = dumps_fs["mill!job#mill.dump-data.json"];
+				assert.deepStrictEqual(typeof dump, 'string');
+				done();
+			}).catch(done);
+	});
+
 
 });
