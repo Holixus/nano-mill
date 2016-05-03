@@ -16,6 +16,10 @@ function defaults(opts, defs, defs2) {
 	return opts;
 }
 
+function name2id(name) {
+	return name.replace(/^.*?([^/]+)\.[a-z0-9]+$/i, '$1');
+}
+
 var plugins = {
 	'plugins': function readPlugins(log, opts) {
 		var mill = log.job.sched.mill,
@@ -87,17 +91,27 @@ var plugins = {
 		for (var id in rules) {
 			var rule = rules[id],
 			    re = undefined,
+			    name = undefined,
 			    args = undefined;
 
 			if (rule[0] instanceof RegExp)
 				re = rule.splice(0,1)[0];
+			else
+				if (typeof rule[0] === 'string' && rule[0].indexOf('>') < 0)
+					name = rule.splice(0,1)[0];
 
 			if (typeof rule[0] === 'object')
 				args = rule.splice(0,1)[0];
 
 			if (!re) {
-				sched.job(id, defaults({
-					}, args, defs)).seq(rule);
+				if (name)
+					sched.job(id, defaults({
+							name: name,
+							id: name2id(name)
+						}, args, defs)).seq(rule);
+				else
+					sched.job(id, defaults({
+						}, args, defs)).seq(rule);
 				continue;
 			}
 
@@ -107,7 +121,7 @@ var plugins = {
 					return;
 				var job = sched.job(name, defaults({
 						name: name,
-						id: ok[1] || name.replace(/^.*?([^/]+)\.[a-z0-9]+$/i, '$1')
+						id: ok[1] || name2id(name)
 					}, args, defs));
 				job.seq(rule);
 			});

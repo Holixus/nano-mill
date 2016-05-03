@@ -468,5 +468,28 @@ suite('mill', function () {
 			}).catch(done);
 	});
 
+	test('10 - file without RegExp', function (done) {
+		var fstree = { 'test.json': '{ }' },
+		    opts = {
+		    	plugins_folder: Path.resolve(__dirname+'/../samples/plugins'),
+		    	dumps_folder:   {},
+		    	sources_folder: fstree,
+		    	dist_folder: fstree,
+		    	console: _console,
+		    	plugins: {
+		    		'fs': 'nano-sched-fs'
+		    	},
+		    	rules: {
+		    		job: [ 'test.json', { dest: '\\1\\2+\\3' }, '> fs.load-text, fs.rename, fs.save >' ]
+		    	}
+		    },
+		    mill = Mill(opts);
+
+		mill.build(opts)
+			.then(function () {
+				assert.strictEqual(fstree['test+.json'], fstree['test.json']);
+				done();
+			}).catch(done);
+	});
 
 });
